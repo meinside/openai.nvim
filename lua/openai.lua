@@ -40,6 +40,7 @@ function M.edit_code(text)
     user = userAgent,
   })
 
+  local ret = nil
   if response then
     err = net.on_choice(response, function(choice)
       local output = choice.text or 'Text from OpenAI was empty.'
@@ -50,7 +51,7 @@ function M.edit_code(text)
         ui.exit_visual_mode()
       end
 
-      return output
+      ret = output
     end)
   end
 
@@ -60,7 +61,7 @@ function M.edit_code(text)
 
   ui.exit_visual_mode()
 
-  return nil
+  return ret
 end
 
 -- complete given chat text
@@ -84,6 +85,7 @@ function M.complete_chat(text)
     user = userAgent,
   })
 
+  local ret = nil
   if response then
     err = net.on_choice(response, function(choice)
       local output = choice.message.content or 'Message content from OpenAI was empty.'
@@ -94,7 +96,7 @@ function M.complete_chat(text)
         ui.exit_visual_mode()
       end
 
-      return output
+      ret = output
     end)
   end
 
@@ -104,7 +106,7 @@ function M.complete_chat(text)
 
   ui.exit_visual_mode()
 
-  return nil
+  return ret
 end
 
 
