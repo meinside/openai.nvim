@@ -1,14 +1,17 @@
 -- lua/openai/fs.lua
 
+-- dependencies
+local path = require'plenary.path'
 
-local M = {}
+-- plugin modules
+local config = require'openai/config'
 
--- constants
-M.ConfigFilepath = '.config/openai-nvim.json'
+local Fs = {}
 
 -- read and return openai api credentials
-function M.openai_credentials()
-  local f = io.open(M.ConfigFilepath, 'r')
+function Fs.openai_credentials()
+  local f = io.open(path:new(config.options.credentialsFilepath):expand(), 'r')
+
   if f ~= nil then
     local str = f:read('*a')
     io.close(f)
@@ -22,5 +25,5 @@ function M.openai_credentials()
   return nil, nil
 end
 
-return M
+return Fs
 
