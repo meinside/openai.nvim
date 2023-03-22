@@ -4,12 +4,10 @@ local Config = {}
 
 -- default configuration
 Config.options = {
-  credentialsFilepath = '.config/openai-nvim.json',
+  credentialsFilepath = '~/.config/openai-nvim.json',
   models = {
-    --editCode = 'code-davinci-edit-001',
-    --completeChat = 'gpt-3.5-turbo',
-    editCode = 'xxxx',
-    completeChat = 'yyyy',
+    editCode = 'code-davinci-edit-001',
+    completeChat = 'gpt-3.5-turbo',
   },
 }
 
