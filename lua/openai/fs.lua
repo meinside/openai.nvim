@@ -1,12 +1,17 @@
 -- lua/openai/fs.lua
 
+-- dependencies
+local path = require'plenary.path'
+
+-- plugin modules
 local config = require'openai/config'
 
 local Fs = {}
 
 -- read and return openai api credentials
 function Fs.openai_credentials()
-  local f = io.open(config.options.credentialsFilepath, 'r')
+  local f = io.open(path:new(config.options.credentialsFilepath):expand(), 'r')
+
   if f ~= nil then
     local str = f:read('*a')
     io.close(f)

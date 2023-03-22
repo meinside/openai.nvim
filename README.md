@@ -23,6 +23,17 @@ Grab a visual block and run commands:
 {
     'meinside/openai.nvim',
     dependencies = { { 'nvim-lua/plenary.nvim' } },
+    config = function()
+      require'openai'.setup {
+        -- NOTE: default values:
+
+        --credentialsFilepath = '~/.config/openai-nvim.json',
+        --models = {
+        --  editCode = 'code-davinci-edit-001',
+        --  completeChat = 'gpt-3.5-turbo',
+        --},
+      }
+    end,
 },
 ```
 
