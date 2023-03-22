@@ -10,8 +10,14 @@ local userAgent = 'meinside/openai-nvim'
 -- plugin modules
 local ui = require'openai/ui'
 local net = require'openai/net'
+local config = require'openai/config'
 
 local M = {}
+
+-- setup function for configuration
+function M.setup(opts)
+  config.override(opts)
+end
 
 -- edit given code text with codex
 function M.edit_code(text)
@@ -29,7 +35,7 @@ function M.edit_code(text)
   end
 
   local response, err = net.post('v1/edits', {
-    model = 'code-davinci-edit-001',
+    model = config.options.models.editCode,
     instruction = text,
     user = userAgent,
   })
@@ -73,7 +79,7 @@ function M.complete_chat(text)
   end
 
   local response, err = net.post('v1/chat/completions', {
-    model = 'gpt-3.5-turbo',
+    model = config.options.models.completeChat,
     messages = { { role = 'user', content = text } },
     user = userAgent,
   })
