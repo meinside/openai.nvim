@@ -16,7 +16,7 @@ local M = {}
 
 -- setup function for configuration
 function M.setup(opts)
-  config.setup(opts)
+  config.override(opts)
 end
 
 -- edit given code text with codex

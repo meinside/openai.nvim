@@ -13,8 +13,8 @@ Config.options = {
   },
 }
 
--- setup configuration
-function Config.setup(opts)
+-- override configurations
+function Config.override(opts)
   opts = opts or {}
 
   Config.options = vim.tbl_deep_extend('force', {}, Config.options, opts)
