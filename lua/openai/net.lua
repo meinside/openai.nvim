@@ -5,28 +5,29 @@ local plenary = require'plenary/curl'
 
 -- plugin modules
 local fs = require'openai/fs'
+local config = require'openai/config'
 
 -- constants
 local baseurl = 'https://api.openai.com'
 local contentType = 'application/json'
 
-local M = {}
+local Net = {}
 
 -- generate a request url
-function M.openai_request_url(endpoint)
+local function openai_request_url(endpoint)
   return baseurl .. '/' .. endpoint
 end
 
 -- send http post request
-function M.post(endpoint, params)
-  local apiKey, orgId = M.openai_credentials()
+function Net.post(endpoint, params)
+  local apiKey, orgId = fs.openai_credentials()
 
   if apiKey == nil or orgId == nil then
-    local err = 'No "api_key" or "org_id" value in config file: ' .. fs.ConfigFilepath
+    local err = 'No "api_key" or "org_id" value in config file: ' .. config.options.credentialsFilepath
     return nil, err
   end
 
-  return plenary.post(M.openai_request_url(endpoint), {
+  return plenary.post(openai_request_url(endpoint), {
     headers = {
       ['Content-Type'] = contentType,
       ['Authorization'] = 'Bearer ' .. apiKey,
@@ -37,7 +38,7 @@ function M.post(endpoint, params)
 end
 
 -- parse response and callback with the first choice
-function M.on_choice(response, fn)
+function Net.on_choice(response, fn)
   local err = nil
 
   if response then
@@ -57,5 +58,5 @@ function M.on_choice(response, fn)
   return err
 end
 
-return M
+return Net
 

@@ -1,14 +1,12 @@
 -- lua/openai/fs.lua
 
+local config = require'openai/config'
 
-local M = {}
-
--- constants
-M.ConfigFilepath = '.config/openai-nvim.json'
+local Fs = {}
 
 -- read and return openai api credentials
-function M.openai_credentials()
-  local f = io.open(M.ConfigFilepath, 'r')
+function Fs.openai_credentials()
+  local f = io.open(config.options.credentialsFilepath, 'r')
   if f ~= nil then
     local str = f:read('*a')
     io.close(f)
@@ -22,5 +20,5 @@ function M.openai_credentials()
   return nil, nil
 end
 
-return M
+return Fs
 
