@@ -48,7 +48,7 @@ It also can be run with lua:
 
 ```lua
 {
-    'meinside/opWhat is your name? enai.nvim',
+    'meinside/openai.nvim',
     dependencies = { { 'nvim-lua/plenary.nvim' } },
     config = function()
       require'openai'.setup {
