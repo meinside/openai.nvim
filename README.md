@@ -2,26 +2,44 @@
 
 "Dead Simple OpenAI Plugin for Neovim"
 
-A neovim plugin for requesting [code edit (Codex)](https://platform.openai.com/docs/guides/code) and [chat completion (ChatGPT)](https://platform.openai.com/docs/guides/chat).
+A neovim plugin for requesting [completion](https://platform.openai.com/docs/guides/completion), [code edit (Codex)](https://platform.openai.com/docs/guides/code) and [chat completion (ChatGPT)](https://platform.openai.com/docs/guides/chat).
 
 Not feature-rich, just for testing and studying by myself.
 
 ## Usage
 
-### Visual Mode
-
-Grab a visual block and run commands:
+### Commands
 
 | Command | Action |
 | --- | --- |
-| :OpenaiCodex | Replace selected block with the result of code edit. |
-| :OpenaiComplete | Replace selected block with the result of chat completion. |
+| :OpenaiEdit | Fix grammar and spelling mistakes of the given text. |
+| :OpenaiCodex | Generate code by the given text as an instruction. |
+| :OpenaiComplete | Generate text by the given text as a prompt of chat completion. |
 
-### Lua Function
+The response of API will be inserted in the current cursor position.
 
 ```vim
-:lua =require'openai'.edit_code([[Write a golang code which deletes all files and directories recursively.]])
-:lua =require'openai'.complete_chat([[What is the answer to life, the universe, and everything?]])
+:OpenaiEdit wat iz ur name?
+:OpenaiCodex create a clojure fibonacci function which is not recursive
+:OpenaiComplete what is the answer to life, the universe, and everything?
+```
+
+Grab a visual block and run commands, then the selected block will be replaced with the response of API.
+
+```vim
+:'<,'>OpenaiEdit
+:'<,'>OpenaiCodex
+:'<,'>OpenaiComplete
+```
+
+### Lua Functions
+
+It also can be run with lua:
+
+```vim
+:lua =require'openai'.edit({input = [[Wat iz ur name?]], instruction = [[Fix the grammar and spelling mistakes.]], return_only = true})
+:lua =require'openai'.edit_code({instruction = [[Refactor this ruby code to a shorter one.]], input = [[a = 1\nb = 2\ntemp = a\na = b\nb = temp]], return_only = true})
+:lua =require'openai'.complete_chat({input = [[What is the answer to life, the universe, and everything?]], return_only = true})
 ```
 
 ## Install
@@ -30,14 +48,15 @@ Grab a visual block and run commands:
 
 ```lua
 {
-    'meinside/openai.nvim',
+    'meinside/opWhat is your name? enai.nvim',
     dependencies = { { 'nvim-lua/plenary.nvim' } },
     config = function()
       require'openai'.setup {
-        -- NOTE: default values:
+        -- NOTE: these are default values:
 
         --credentialsFilepath = '~/.config/openai-nvim.json',
         --models = {
+        --  edit = 'text-davinci-edit-001',
         --  editCode = 'code-davinci-edit-001',
         --  completeChat = 'gpt-3.5-turbo',
         --},
@@ -62,7 +81,7 @@ Create `openai-nvim.json` file in `~/.config/`:
 - [ ] Deal with long response times of OpenAI API (currently times out in 10 seconds, using [plenary](https://github.com/nvim-lua/plenary.nvim))
 - [ ] Implement/add all API functions
   - [ ] [Models](https://platform.openai.com/docs/api-reference/models)
-  - [ ] [Completions](https://platform.openai.com/docs/api-reference/completions)
+  - [X] [Completions](https://platform.openai.com/docs/api-reference/completions)
   - [X] [Chat](https://platform.openai.com/docs/api-reference/chat)
   - [X] [Edits](https://platform.openai.com/docs/api-reference/edits)
   - [ ] [Images](https://platform.openai.com/docs/api-reference/images)

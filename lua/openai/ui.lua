@@ -1,4 +1,6 @@
 -- lua/openai/ui.lua
+--
+-- last update: 2023.03.23.
 
 -- plugin modules
 local util = require'openai/util'
@@ -45,6 +47,12 @@ end
 function Ui.replace_text(start_row, start_col, end_row, end_col, text)
   vim.api.nvim_buf_set_text(0, start_row - 1, start_col, end_row - 1, end_col, {})
   vim.api.nvim_buf_set_text(0, start_row - 1, start_col, start_row - 1, start_col, { unpack(util.split(text, '\n')) })
+end
+
+-- insert given text at current cursor position
+function Ui.insert_text_at_current_cursor(text)
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { unpack(util.split(text, '\n')) })
 end
 
 -- exit visual mode
