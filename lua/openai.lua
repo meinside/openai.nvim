@@ -27,13 +27,13 @@ end
 --   {
 --     input = "some text to edit",
 --     instruction = "your instruction here (optional)",
---     return_only = false, -- when true, will not replace or insert text on API responses
+--     update_ui = false, -- when true, will replace or insert text in the UI
 --   }
 --
 -- NOTE: default value of `params.instruction` = 'Fix the grammar and spelling mistakes.'
 function M.edit(params)
   params = params or {}
-  local input, instruction = params.input, params.instruction
+  local input, instruction, update_ui = params.input, params.instruction, params.update_ui
 
   local start_row, start_col = 0, 0
   local end_row, end_col = 0, 0
@@ -60,7 +60,7 @@ function M.edit(params)
     err = net.on_choice(response, function(choice)
       local output = choice.text or 'Text from OpenAI was empty.'
 
-      if not params.return_only then
+      if update_ui then
         if ui.is_valid_range(start_row, start_col, end_row, end_col) then
           ui.replace_text(start_row, start_col, end_row, end_col, output)
           ui.exit_visual_mode()
@@ -87,14 +87,13 @@ end
 --   {
 --     instruction = "your instruction here",
 --     input = "some code to edit (optional)",
---     return_only = false, -- when true, will not replace or insert text on API responses
+--     update_ui = false, -- when true, will replace or insert text in the UI
 --   }
 --
 -- NOTE: default value of `params.input` = ''
 function M.edit_code(params)
   params = params or {}
-  local input = params.input
-  local instruction = params.instruction
+  local input, instruction, update_ui = params.input, params.instruction, params.update_ui
 
   local start_row, start_col = 0, 0
   local end_row, end_col = 0, 0
@@ -121,7 +120,7 @@ function M.edit_code(params)
     err = net.on_choice(response, function(choice)
       local output = choice.text or 'Text from OpenAI was empty.'
 
-      if not params.return_only then
+      if update_ui then
         if ui.is_valid_range(start_row, start_col, end_row, end_col) then
           ui.replace_text(start_row, start_col, end_row, end_col, output)
           ui.exit_visual_mode()
@@ -147,12 +146,12 @@ end
 --
 --   {
 --     input = "your prompt here (optional)",
---     return_only = false, -- when true, will not replace or insert text on API responses
+--     update_ui = false, -- when true, will replace or insert text in the UI
 --   }
 --
 function M.complete_chat(params)
   params = params or {}
-  local input = params.input
+  local input, update_ui = params.input, params.update_ui
 
   local start_row, start_col = 0, 0
   local end_row, end_col = 0, 0
@@ -178,7 +177,7 @@ function M.complete_chat(params)
     err = net.on_choice(response, function(choice)
       local output = choice.message.content or 'Message content from OpenAI was empty.'
 
-      if not params.return_only then
+      if update_ui then
         if ui.is_valid_range(start_row, start_col, end_row, end_col) then
           ui.replace_text(start_row, start_col, end_row, end_col, output)
           ui.exit_visual_mode()
