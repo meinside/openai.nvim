@@ -59,7 +59,6 @@ Create `openai-nvim.json` file in `~/.config/`:
 
 ## Todo
 
-- [ ] Deal with long response times of OpenAI API (currently times out in 10 seconds, using [plenary](https://github.com/nvim-lua/plenary.nvim))
 - [ ] Implement/add all API functions
   - [ ] [Models](https://platform.openai.com/docs/api-reference/models)
   - [ ] [Completions](https://platform.openai.com/docs/api-reference/completions)

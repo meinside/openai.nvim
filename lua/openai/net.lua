@@ -1,7 +1,7 @@
 -- lua/openai/net.lua
 
 -- dependencies
-local plenary = require'plenary/curl'
+local curl = require'plenary/curl'
 
 -- plugin modules
 local fs = require'openai/fs'
@@ -27,13 +27,14 @@ function Net.post(endpoint, params)
     return nil, err
   end
 
-  return plenary.post(openai_request_url(endpoint), {
+  return curl.post(openai_request_url(endpoint), {
     headers = {
       ['Content-Type'] = contentType,
       ['Authorization'] = 'Bearer ' .. apiKey,
       ['OpenAI-Organization'] = orgId,
     },
     raw_body = vim.json.encode(params),
+    timeout = 60 * 1000, -- https://github.com/nvim-lua/plenary.nvim/pull/475
   }), nil
 end
 
