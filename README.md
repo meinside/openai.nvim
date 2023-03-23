@@ -37,9 +37,9 @@ Grab a visual block and run commands, then the selected block will be replaced w
 It also can be run with lua:
 
 ```vim
-:lua =require'openai'.edit({input = [[Wat iz ur name?]], instruction = [[Fix the grammar and spelling mistakes.]], return_only = true})
-:lua =require'openai'.edit_code({instruction = [[Refactor this ruby code to a shorter one.]], input = [[a = 1\nb = 2\ntemp = a\na = b\nb = temp]], return_only = true})
-:lua =require'openai'.complete_chat({input = [[What is the answer to life, the universe, and everything?]], return_only = true})
+:lua =require'openai'.edit({input = [[Wat iz ur name?]], instruction = [[Fix the grammar and spelling mistakes.]]})
+:lua =require'openai'.edit_code({instruction = [[Refactor this ruby code to a shorter one.]], input = [[a = 1\nb = 2\ntemp = a\na = b\nb = temp]]})
+:lua =require'openai'.complete_chat({input = [[What is the answer to life, the universe, and everything?]]})
 ```
 
 ## Install
