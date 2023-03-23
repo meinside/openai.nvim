@@ -1,4 +1,6 @@
 -- lua/openai/util.lua
+--
+-- last update: 2023.03.23.
 
 local Util = {}
 
