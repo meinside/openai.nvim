@@ -24,6 +24,20 @@ vim.api.nvim_create_user_command(
   { range = true, nargs = '?' }
 )
 
+-- :OpenaiModels
+--
+vim.api.nvim_create_user_command(
+  'OpenaiModels',
+  function()
+    local args = {
+      update_ui = true,
+    }
+
+    require'openai'.list_models(args)
+  end,
+  { range = false, nargs = 0 }
+)
+
 -- :OpenaiModerate [input-text]
 --
 vim.api.nvim_create_user_command(

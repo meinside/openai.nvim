@@ -76,6 +76,44 @@ function M.complete_chat(params)
   return ret
 end
 
+-- list models
+--
+-- * `params`:
+--
+--   {
+--     update_ui = false, -- when true, will display the result in the UI
+--   }
+--
+function M.list_models(params)
+  params = params or {}
+  local update_ui = params.update_ui
+
+  local response, err = net.get('v1/models', nil)
+
+  local ret = nil
+  if response then
+    err = net.on_models(response, function(results)
+      local output = ''
+
+      for _, result in ipairs(results) do
+        output = output .. result.id ..  '\n'
+      end
+
+      if update_ui then
+        ui.info(output)
+      end
+
+      ret = output
+    end)
+  end
+
+  if err then
+    ui.error(err)
+  end
+
+  return ret
+end
+
 -- moderate given input
 --
 -- * `params`:
@@ -89,6 +127,19 @@ function M.moderate(params)
   params = params or {}
   local input, update_ui = params.input, params.update_ui
 
+  local start_row, start_col = 0, 0
+  local end_row, end_col = 0, 0
+
+  if not input then
+    start_row, start_col, end_row, end_col = ui.get_selection()
+    input = ui.get_text(start_row, start_col, end_row, end_col)
+
+    if not input then
+      ui.error('No visually selected input or function argument for moderation.')
+      return nil
+    end
+  end
+
   local response, err = net.post('v1/moderations', {
     model = config.options.models.moderation,
     input = input or ''
@@ -100,7 +151,7 @@ function M.moderate(params)
       local output = nil
 
       if result.flagged then
-        local categories, scores = result.categories, result.scores
+        local categories, scores = result.categories, result.category_scores
         output = 'Given input was flagged for:\n\n' .. vim.inspect(categories) .. '\n\n' .. vim.inspect(scores)
       else
         output = 'Given input was not flagged.'
