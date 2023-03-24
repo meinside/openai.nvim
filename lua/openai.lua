@@ -2,11 +2,10 @@
 --
 -- OpenAI plugin functions
 --
--- last update: 2023.03.23.
+-- last update: 2023.03.24.
 
 -- constants
 local userAgent = 'meinside/openai-nvim'
-local defaultEditInstruction = 'Fix the grammar and spelling mistakes. Do not answer to it.'
 
 -- plugin modules
 local ui = require'openai/ui'
@@ -20,155 +19,35 @@ function M.setup(opts)
   config.override(opts)
 end
 
--- edit given text
---
--- * `params`:
---
---   {
---     input = "some text to edit",
---     instruction = "your instruction here (optional)",
---     update_ui = false, -- when true, will replace or insert text in the UI
---   }
---
--- NOTE: default value of `params.instruction` = 'Fix the grammar and spelling mistakes.'
-function M.edit(params)
-  params = params or {}
-  local input, instruction, update_ui = params.input, params.instruction, params.update_ui
-
-  local start_row, start_col = 0, 0
-  local end_row, end_col = 0, 0
-
-  if not input then
-    start_row, start_col, end_row, end_col = ui.get_selection()
-    input = ui.get_text(start_row, start_col, end_row, end_col)
-
-    if not input then
-      ui.error('No visually selected text or function argument for editing.')
-      return nil
-    end
-  end
-
-  local response, err = net.post('v1/edits', {
-    model = config.options.models.edit,
-    instruction = instruction or defaultEditInstruction,
-    input = input,
-    user = userAgent,
-  })
-
-  local ret = nil
-  if response then
-    err = net.on_choice(response, function(choice)
-      local output = choice.text or 'Text from OpenAI was empty.'
-
-      if update_ui then
-        if ui.is_valid_range(start_row, start_col, end_row, end_col) then
-          ui.replace_text(start_row, start_col, end_row, end_col, output)
-          ui.exit_visual_mode()
-        else
-          ui.insert_text_at_current_cursor(output)
-        end
-      end
-
-      ret = output
-    end)
-  end
-
-  if err then
-    ui.error(err)
-  end
-
-  return ret
-end
-
--- edit given code text with codex
---
--- * `params`:
---
---   {
---     instruction = "your instruction here",
---     input = "some code to edit (optional)",
---     update_ui = false, -- when true, will replace or insert text in the UI
---   }
---
--- NOTE: default value of `params.input` = ''
-function M.edit_code(params)
-  params = params or {}
-  local input, instruction, update_ui = params.input, params.instruction, params.update_ui
-
-  local start_row, start_col = 0, 0
-  local end_row, end_col = 0, 0
-
-  if not instruction then
-    start_row, start_col, end_row, end_col = ui.get_selection()
-    instruction = ui.get_text(start_row, start_col, end_row, end_col)
-
-    if not instruction then
-      ui.error('No visually selected code text or function argument for editing.')
-      return nil
-    end
-  end
-
-  local response, err = net.post('v1/edits', {
-    model = config.options.models.editCode,
-    instruction = instruction,
-    input = input or '',
-    user = userAgent,
-  })
-
-  local ret = nil
-  if response then
-    err = net.on_choice(response, function(choice)
-      local output = choice.text or 'Text from OpenAI was empty.'
-
-      if update_ui then
-        if ui.is_valid_range(start_row, start_col, end_row, end_col) then
-          ui.replace_text(start_row, start_col, end_row, end_col, output)
-          ui.exit_visual_mode()
-        else
-          ui.insert_text_at_current_cursor(output)
-        end
-      end
-
-      ret = output
-    end)
-  end
-
-  if err then
-    ui.error(err)
-  end
-
-  return ret
-end
-
 -- complete given chat text
 --
 -- * `params`:
 --
 --   {
---     input = "your prompt here (optional)",
+--     prompt = "your prompt here",
 --     update_ui = false, -- when true, will replace or insert text in the UI
 --   }
 --
 function M.complete_chat(params)
   params = params or {}
-  local input, update_ui = params.input, params.update_ui
+  local prompt, update_ui = params.prompt, params.update_ui
 
   local start_row, start_col = 0, 0
   local end_row, end_col = 0, 0
 
-  if not input then
+  if not prompt then
     start_row, start_col, end_row, end_col = ui.get_selection()
-    input = ui.get_text(start_row, start_col, end_row, end_col)
+    prompt = ui.get_text(start_row, start_col, end_row, end_col)
 
-    if not input then
-      ui.error('No visually selected prompt or function argument for completion.')
+    if not prompt then
+      ui.error('No visually selected prompt or function argument for chat completion.')
       return nil
     end
   end
 
   local response, err = net.post('v1/chat/completions', {
     model = config.options.models.completeChat,
-    messages = { { role = 'user', content = input } },
+    messages = { { role = 'user', content = prompt } },
     user = userAgent,
   })
 
@@ -184,6 +63,51 @@ function M.complete_chat(params)
         else
           ui.insert_text_at_current_cursor(output)
         end
+      end
+
+      ret = output
+    end)
+  end
+
+  if err then
+    ui.error(err)
+  end
+
+  return ret
+end
+
+-- moderate given input
+--
+-- * `params`:
+--
+--   {
+--     input = "your input text for moderation",
+--     update_ui = false, -- when true, will display the result in the UI
+--   }
+--
+function M.moderate(params)
+  params = params or {}
+  local input, update_ui = params.input, params.update_ui
+
+  local response, err = net.post('v1/moderations', {
+    model = config.options.models.moderation,
+    input = input or ''
+  })
+
+  local ret = nil
+  if response then
+    err = net.on_moderation(response, function(result)
+      local output = nil
+
+      if result.flagged then
+        local categories, scores = result.categories, result.scores
+        output = 'Given input was flagged for:\n\n' .. vim.inspect(categories) .. '\n\n' .. vim.inspect(scores)
+      else
+        output = 'Given input was not flagged.'
+      end
+
+      if update_ui then
+        ui.info(output)
       end
 
       ret = output

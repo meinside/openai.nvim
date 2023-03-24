@@ -40,6 +40,27 @@ function Net.post(endpoint, params)
   }), nil
 end
 
+-- parse response and callback with the first moderation result
+function Net.on_moderation(response, fn)
+  local err = nil
+
+  if response then
+    local body = response.body or '{}'
+    local parsed = vim.json.decode(body)
+    if response.status == 200 then
+      if parsed.results and #parsed.results > 0 then
+        fn(parsed.results[1])
+      else
+        err = 'There was no usable moderation result from OpenAI API.'
+      end
+    else
+      err = 'Error from OpenAI: ' .. vim.inspect(parsed)
+    end
+  end
+
+  return err
+end
+
 -- parse response and callback with the first choice
 function Net.on_choice(response, fn)
   local err = nil

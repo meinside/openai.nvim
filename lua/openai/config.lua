@@ -8,9 +8,8 @@ local Config = {}
 Config.options = {
   credentialsFilepath = '~/.config/openai-nvim.json',
   models = {
-    edit = 'text-davinci-edit-001',
-    editCode = 'code-davinci-edit-001',
     completeChat = 'gpt-3.5-turbo',
+    moderation = 'text-moderation-latest',
   },
 }
 
