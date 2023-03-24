@@ -2,7 +2,7 @@
 
 "Dead Simple OpenAI Plugin for Neovim"
 
-A neovim plugin for requesting [completion](https://platform.openai.com/docs/guides/completion), [code edit (Codex)](https://platform.openai.com/docs/guides/code) and [chat completion (ChatGPT)](https://platform.openai.com/docs/guides/chat).
+A neovim plugin for inserting/replacing text generated from OpenAI APIs.
 
 Not feature-rich, just for testing and studying by myself.
 
@@ -12,24 +12,23 @@ Not feature-rich, just for testing and studying by myself.
 
 | Command | Action |
 | --- | --- |
-| :OpenaiEdit | Fix grammar and spelling mistakes of the given text. |
-| :OpenaiCodex | Generate code by the given text as an instruction. |
-| :OpenaiComplete | Generate text by the given text as a prompt of chat completion. |
+| :OpenaiCompleteChat | Generate text by the given text as a prompt of [chat completion (ChatGPT)](https://platform.openai.com/docs/guides/chat) |
+| :OpenaiModels | List available model ids with [models API](https://platform.openai.com/docs/api-reference/models/retrieve) |
+| :OpenaiModerate | [Classify given text](https://platform.openai.com/docs/api-reference/moderations/create) if it violates OpenAI's Content Policy |
 
-The response of API will be inserted in the current cursor position.
+The response of API will be inserted in the current cursor position, or displayed in the screen with `vim.notify()`.
 
 ```vim
-:OpenaiEdit wat iz ur name?
-:OpenaiCodex create a clojure fibonacci function which is not recursive
-:OpenaiComplete what is the answer to life, the universe, and everything?
+:OpenaiCompleteChat What is the answer to life, the universe, and everything?
+:OpenaiModels
+:OpenaiModerate I want to kill them all.
 ```
 
-Grab a visual block and run commands, then the selected block will be replaced with the response of API.
+Grab a visual block and run commands, then the response will replace selected block, or just be displayed with `vim.notify()`.
 
 ```vim
-:'<,'>OpenaiEdit
-:'<,'>OpenaiCodex
-:'<,'>OpenaiComplete
+:'<,'>OpenaiCompleteChat
+:'<,'>OpenaiModerate
 ```
 
 ### Lua Functions
@@ -37,9 +36,9 @@ Grab a visual block and run commands, then the selected block will be replaced w
 It also can be run with lua:
 
 ```vim
-:lua =require'openai'.edit({input = [[Wat iz ur name?]], instruction = [[Fix the grammar and spelling mistakes.]]})
-:lua =require'openai'.edit_code({instruction = [[Refactor this ruby code to a shorter one.]], input = [[a = 1\nb = 2\ntemp = a\na = b\nb = temp]]})
-:lua =require'openai'.complete_chat({input = [[What is the answer to life, the universe, and everything?]]})
+:lua =require'openai'.complete_chat({prompt = [[What is the answer to life, the universe, and everything?]]})
+:lua =require'openai'.list_models()
+:lua =require'openai'.moderate({input = [[I want to kill them all.]]})
 ```
 
 ## Install
@@ -56,9 +55,8 @@ It also can be run with lua:
 
         --credentialsFilepath = '~/.config/openai-nvim.json',
         --models = {
-        --  edit = 'text-davinci-edit-001',
-        --  editCode = 'code-davinci-edit-001',
         --  completeChat = 'gpt-3.5-turbo',
+        --  moderation = 'text-moderation-latest',
         --},
       }
     end,
@@ -78,17 +76,18 @@ Create `openai-nvim.json` file in `~/.config/`:
 
 ## Todo
 
+- [ ] Handle API timeouts more generously. (times out in 10 seconds for now, waiting for [PR](https://github.com/nvim-lua/plenary.nvim/pull/475))
 - [ ] Implement/add all API functions
-  - [ ] [Models](https://platform.openai.com/docs/api-reference/models)
-  - [X] [Completions](https://platform.openai.com/docs/api-reference/completions)
+  - [X] [Models](https://platform.openai.com/docs/api-reference/models): can be used with a free account
+  - [X] ~~[Completions](https://platform.openai.com/docs/api-reference/completions)~~ (`text-davinci-edit-001` not working since 2023.03.24.)
   - [X] [Chat](https://platform.openai.com/docs/api-reference/chat)
-  - [X] [Edits](https://platform.openai.com/docs/api-reference/edits)
+  - [X] ~~[Edits](https://platform.openai.com/docs/api-reference/edits)~~ (`code-davinci-edit-001` not working since 2023.03.24, related to ['Codex API is discontinued'](https://news.ycombinator.com/item?id=35242069)?)
   - [ ] [Images](https://platform.openai.com/docs/api-reference/images)
   - [ ] [Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
   - [ ] [Audio](https://platform.openai.com/docs/api-reference/audio)
   - [ ] [Files](https://platform.openai.com/docs/api-reference/files)
   - [ ] [Fine-tunes](https://platform.openai.com/docs/api-reference/fine-tunes)
-  - [ ] [Moderations](https://platform.openai.com/docs/api-reference/moderations)
+  - [X] [Moderations](https://platform.openai.com/docs/api-reference/moderations): can be used with a free account
 
 ## License
 

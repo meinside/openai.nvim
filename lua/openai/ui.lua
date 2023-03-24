@@ -7,6 +7,11 @@ local util = require'openai/util'
 
 local Ui = {}
 
+-- show info notification
+function Ui.info(str)
+  vim.notify(str, vim.log.levels.INFO)
+end
+
 -- show error notification
 function Ui.error(str)
   vim.notify(str, vim.log.levels.ERROR)
