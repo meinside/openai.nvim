@@ -1,9 +1,9 @@
 -- lua/openai/fs.lua
 --
--- last update: 2023.03.23.
+-- last update: 2023.03.27.
 
 -- dependencies
-local path = require'plenary.path'
+local path = require'plenary/path'
 
 -- plugin modules
 local config = require'openai/config'
