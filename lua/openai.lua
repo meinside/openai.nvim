@@ -2,10 +2,11 @@
 --
 -- OpenAI plugin functions
 --
--- last update: 2023.03.24.
+-- last update: 2023.03.28.
 
 -- constants
 local userAgent = 'meinside/openai-nvim'
+local defaultEditTextInstruction = 'Fix the grammar and spelling mistakes. Do not answer to it.'
 
 -- plugin modules
 local ui = require'openai/ui'
@@ -76,16 +77,156 @@ function M.complete_chat(params)
   return ret
 end
 
+-- edit given code
+--
+--  * `params`:
+--
+--   {
+--     input = "some code to edit (optional)",
+--     instruction = "your instruction here",
+--     update_ui = false, -- when true, will replace or insert text in the UI
+--   }
+--
+function M.edit_code(params)
+  params = params or {}
+  local input, instruction, update_ui = params.input, params.instruction, params.update_ui
+
+  local start_row, start_col = 0, 0
+  local end_row, end_col = 0, 0
+
+  -- (1) visual block only => visual block will be `instruction`
+  if not instruction then
+    start_row, start_col, end_row, end_col = ui.get_selection()
+    instruction = ui.get_text(start_row, start_col, end_row, end_col)
+
+    if not instruction then
+      ui.error('No visually selected instruction or function argument for text edit.')
+      return nil
+    end
+  else
+    if not input then
+      -- (2) visual block + command argument => visual block will be `input`, and argument will be `instruction`
+      start_row, start_col, end_row, end_col = ui.get_selection()
+      input = ui.get_text(start_row, start_col, end_row, end_col)
+    end
+    -- (3) no visual block + command argument => argument will be `instruction`
+  end
+
+  local response, err = net.post('v1/edits', {
+    model = config.options.models.editCode,
+    instruction = instruction,
+    input = input,
+    user = userAgent,
+  })
+
+  local ret = nil
+  if response then
+    err = net.on_choice(response, function(choice)
+      local output = choice.text or 'Text from OpenAI was empty.'
+
+      if update_ui then
+        if ui.is_valid_range(start_row, start_col, end_row, end_col) then
+          ui.replace_text(start_row, start_col, end_row, end_col, output)
+          ui.exit_visual_mode()
+        else
+          ui.insert_text_at_current_cursor(output)
+        end
+      end
+
+      ret = output
+    end)
+  end
+
+  if err then
+    ui.error(err)
+  end
+
+  return ret
+end
+
+-- edit given text
+--
+--  * `params`:
+--
+--   {
+--     input = "some text to edit",
+--     instruction = "your instruction here (optional)",
+--     update_ui = false, -- when true, will replace or insert text in the UI
+--   }
+--
+function M.edit_text(params)
+  params = params or {}
+  local input, instruction, update_ui = params.input, params.instruction, params.update_ui
+
+  local start_row, start_col = 0, 0
+  local end_row, end_col = 0, 0
+
+  -- (1) visual block only => visual block will be `input`
+  if not input then
+    start_row, start_col, end_row, end_col = ui.get_selection()
+    input = ui.get_text(start_row, start_col, end_row, end_col)
+
+    if not input then
+      ui.error('No visually selected input or function argument for text edit.')
+      return nil
+    end
+  else
+    if not instruction then
+      -- (2) visual block + command argument => visual block will be `input`, and argument will be `instruction`
+      start_row, start_col, end_row, end_col = ui.get_selection()
+      instruction = ui.get_text(start_row, start_col, end_row, end_col)
+
+      if instruction then
+        input, instruction = instruction, input
+      end
+    end
+    -- (3) no visual block + command argument => argument will be `input`
+  end
+
+  local response, err = net.post('v1/edits', {
+    model = config.options.models.editText,
+    instruction = instruction or defaultEditTextInstruction,
+    input = input,
+    user = userAgent,
+  })
+
+  local ret = nil
+  if response then
+    err = net.on_choice(response, function(choice)
+      local output = choice.text or 'Text from OpenAI was empty.'
+
+      if update_ui then
+        if ui.is_valid_range(start_row, start_col, end_row, end_col) then
+          ui.replace_text(start_row, start_col, end_row, end_col, output)
+          ui.exit_visual_mode()
+        else
+          ui.insert_text_at_current_cursor(output)
+        end
+      end
+
+      ret = output
+    end)
+  end
+
+  if err then
+    ui.error(err)
+  end
+
+  return ret
+end
+
 -- list models
 --
 -- * `params`:
 --
 --   {
+--     separator = '\n', -- (optional)
 --     update_ui = false, -- when true, will display the result in the UI
 --   }
 --
 function M.list_models(params)
   params = params or {}
+  local separator = params.separator or '\n'
   local update_ui = params.update_ui
 
   local response, err = net.get('v1/models', nil)
@@ -96,7 +237,7 @@ function M.list_models(params)
       local output = ''
 
       for _, result in ipairs(results) do
-        output = output .. result.id ..  '\n'
+        output = output .. result.id ..  separator
       end
 
       if update_ui then
