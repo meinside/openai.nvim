@@ -1,6 +1,6 @@
 -- lua/openai/config.lua
 --
--- last update: 2023.03.23.
+-- last update: 2023.03.28.
 
 local Config = {}
 
@@ -9,6 +9,8 @@ Config.options = {
   credentialsFilepath = '~/.config/openai-nvim.json',
   models = {
     completeChat = 'gpt-3.5-turbo',
+    editCode = 'code-davinci-edit-001',
+    editText = 'text-davinci-edit-001',
     moderation = 'text-moderation-latest',
   },
 }
