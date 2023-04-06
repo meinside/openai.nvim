@@ -87,7 +87,7 @@ Create `openai-nvim.json` file in `~/.config/`:
 
 ## Todo
 
-- [ ] Handle API timeouts more generously. (times out in 10 seconds for now, waiting for [PR](https://github.com/nvim-lua/plenary.nvim/pull/475))
+- [ ] Handle API timeouts more generously. (waiting for [PR](https://github.com/nvim-lua/plenary.nvim/pull/475))
 - [ ] Implement/add all API functions
   - [X] [Models](https://platform.openai.com/docs/api-reference/models): can be used with a free account
   - [ ] [Completions](https://platform.openai.com/docs/api-reference/completions)
