@@ -1,6 +1,6 @@
 -- lua/openai/config.lua
 --
--- last update: 2023.03.28.
+-- last update: 2023.04.10.
 
 local Config = {}
 
@@ -13,6 +13,7 @@ Config.options = {
     editText = 'text-davinci-edit-001',
     moderation = 'text-moderation-latest',
   },
+  timeout = 60 * 1000, -- will timeout in 60 seconds
 }
 
 -- override configurations
