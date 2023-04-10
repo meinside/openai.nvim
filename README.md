@@ -69,6 +69,7 @@ It also can be run with lua:
         --  editText = 'text-davinci-edit-001',
         --  moderation = 'text-moderation-latest',
         --},
+        --timeout = 60 * 1000,
       }
     end,
 },

@@ -36,7 +36,7 @@ function Net.get(endpoint, params)
       ['OpenAI-Organization'] = orgId,
     },
     query = params,
-    timeout = 60 * 1000,
+    timeout = config.options.timeout,
   }), nil
 end
 
@@ -56,7 +56,7 @@ function Net.post(endpoint, params)
       ['OpenAI-Organization'] = orgId,
     },
     raw_body = vim.json.encode(params),
-    timeout = 60 * 1000,
+    timeout = config.options.timeout,
   }), nil
 end
 
