@@ -268,11 +268,8 @@ function M.moderate(params)
   params = params or {}
   local input, update_ui = params.input, params.update_ui
 
-  local start_row, start_col = 0, 0
-  local end_row, end_col = 0, 0
-
   if not input then
-    start_row, start_col, end_row, end_col = ui.get_selection()
+    local start_row, start_col, end_row, end_col = ui.get_selection()
     input = ui.get_text(start_row, start_col, end_row, end_col)
 
     if not input then
@@ -289,20 +286,16 @@ function M.moderate(params)
   local ret = nil
   if response then
     err = net.on_moderation(response, function(result)
-      local output = nil
-
       if result.flagged then
         local categories, scores = result.categories, result.category_scores
-        output = 'Given input was flagged for:\n\n' .. vim.inspect(categories) .. '\n\n' .. vim.inspect(scores)
+        ret = 'Given input was flagged for:\n\n' .. vim.inspect(categories) .. '\n\n' .. vim.inspect(scores)
       else
-        output = 'Given input was not flagged.'
+        ret = 'Given input was not flagged.'
       end
 
       if update_ui then
-        ui.info(output)
+        ui.info(ret)
       end
-
-      ret = output
     end)
   end
 
