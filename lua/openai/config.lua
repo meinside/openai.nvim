@@ -1,11 +1,11 @@
 -- lua/openai/config.lua
 --
--- last update: 2023.04.10.
+-- last update: 2023.04.13.
 
-local Config = {}
+local M = {}
 
 -- default configuration
-Config.options = {
+M.options = {
   credentialsFilepath = '~/.config/openai-nvim.json',
   models = {
     completeChat = 'gpt-3.5-turbo',
@@ -17,11 +17,11 @@ Config.options = {
 }
 
 -- override configurations
-function Config.override(opts)
+function M.override(opts)
   opts = opts or {}
 
-  Config.options = vim.tbl_deep_extend('force', {}, Config.options, opts)
+  M.options = vim.tbl_deep_extend('force', {}, M.options, opts)
 end
 
-return Config
+return M
 

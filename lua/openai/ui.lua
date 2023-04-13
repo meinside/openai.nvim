@@ -1,29 +1,29 @@
 -- lua/openai/ui.lua
 --
--- last update: 2023.03.23.
+-- last update: 2023.04.13.
 
 -- plugin modules
 local util = require'openai/util'
 
-local Ui = {}
+local M = {}
 
 -- show info notification
-function Ui.info(str)
+function M.info(str)
   vim.notify(str, vim.log.levels.INFO)
 end
 
 -- show error notification
-function Ui.error(str)
+function M.error(str)
   vim.notify(str, vim.log.levels.ERROR)
 end
 
 -- check if given range is valid or not
-function Ui.is_valid_range(start_row, start_col, end_row, end_col)
+function M.is_valid_range(start_row, start_col, end_row, end_col)
   return not ((start_row == 0 and start_col == 0) or (end_row == 0 and end_col == 0))
 end
 
 -- get selected range from visual block
-function Ui.get_selection()
+function M.get_selection()
     local start_row, start_col = unpack(vim.api.nvim_buf_get_mark(0, '<'))
     local end_row, end_col = unpack(vim.api.nvim_buf_get_mark(0, '>'))
 
@@ -31,7 +31,7 @@ function Ui.get_selection()
 end
 
 -- get text from range
-function Ui.get_text(start_row, start_col, end_row, end_col)
+function M.get_text(start_row, start_col, end_row, end_col)
   local n_lines = math.abs(end_row - start_row) + 1
   local lines = vim.api.nvim_buf_get_lines(0, start_row - 1, end_row, false)
 
@@ -49,24 +49,24 @@ function Ui.get_text(start_row, start_col, end_row, end_col)
 end
 
 -- clear and replace text at given range
-function Ui.replace_text(start_row, start_col, end_row, end_col, text)
+function M.replace_text(start_row, start_col, end_row, end_col, text)
   vim.api.nvim_buf_set_text(0, start_row - 1, start_col, end_row - 1, end_col, {})
   vim.api.nvim_buf_set_text(0, start_row - 1, start_col, start_row - 1, start_col, { unpack(util.split(text, '\n')) })
 end
 
 -- insert given text at current cursor position
-function Ui.insert_text_at_current_cursor(text)
+function M.insert_text_at_current_cursor(text)
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { unpack(util.split(text, '\n')) })
 end
 
 -- exit visual mode
 -- NOTE: XXX: not working as my intention - selected visual block is not cleared
-function Ui.exit_visual_mode()
+function M.exit_visual_mode()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<esc>', true, false, true), 'x', false)
   vim.api.nvim_feedkeys('gv', 'x', false)
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<esc>', true, false, true), 'x', false)
 end
 
-return Ui
+return M
 
