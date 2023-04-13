@@ -2,7 +2,7 @@
 --
 -- OpenAI plugin functions
 --
--- last update: 2023.03.28.
+-- last update: 2023.04.13.
 
 -- constants
 local userAgent = 'meinside/openai-nvim'
@@ -295,6 +295,7 @@ function M.moderate(params)
 
       if update_ui then
         ui.info(ret)
+        ui.exit_visual_mode()
       end
     end)
   end

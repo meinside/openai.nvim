@@ -1,13 +1,13 @@
 -- lua/openai/util.lua
 --
--- last update: 2023.03.23.
+-- last update: 2023.04.13.
 
-local Util = {}
+local M = {}
 
 -- split string with delimiters
 --
 -- https://stackoverflow.com/questions/19262761/lua-need-to-split-at-comma
-function Util.split(source, delimiters)
+function M.split(source, delimiters)
   local elements = {}
   local pattern = '([^'..delimiters..']+)'
   _ = string.gsub(source, pattern, function(value)
@@ -16,5 +16,5 @@ function Util.split(source, delimiters)
   return elements
 end
 
-return Util
+return M
 

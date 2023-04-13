@@ -1,6 +1,6 @@
 -- lua/openai/net.lua
 --
--- last update: 2023.04.10.
+-- last update: 2023.04.13.
 
 -- external dependencies
 local curl = require'plenary/curl'
@@ -13,7 +13,7 @@ local config = require'openai/config'
 local baseurl = 'https://api.openai.com'
 local contentType = 'application/json'
 
-local Net = {}
+local M = {}
 
 -- generate a request url
 local function openai_request_url(endpoint)
@@ -21,7 +21,7 @@ local function openai_request_url(endpoint)
 end
 
 -- send http get request
-function Net.get(endpoint, params)
+function M.get(endpoint, params)
   local apiKey, orgId = fs.openai_credentials()
 
   if apiKey == nil or orgId == nil then
@@ -41,7 +41,7 @@ function Net.get(endpoint, params)
 end
 
 -- send http post request
-function Net.post(endpoint, params)
+function M.post(endpoint, params)
   local apiKey, orgId = fs.openai_credentials()
 
   if apiKey == nil or orgId == nil then
@@ -61,7 +61,7 @@ function Net.post(endpoint, params)
 end
 
 -- parse response and callback with the first choice
-function Net.on_choice(response, fn)
+function M.on_choice(response, fn)
   local err = nil
 
   if response then
@@ -82,7 +82,7 @@ function Net.on_choice(response, fn)
 end
 
 -- parse response and callback with the models
-function Net.on_models(response, fn)
+function M.on_models(response, fn)
   local err = nil
 
   if response then
@@ -103,7 +103,7 @@ function Net.on_models(response, fn)
 end
 
 -- parse response and callback with the first moderation result
-function Net.on_moderation(response, fn)
+function M.on_moderation(response, fn)
   local err = nil
 
   if response then
@@ -123,5 +123,5 @@ function Net.on_moderation(response, fn)
   return err
 end
 
-return Net
+return M
 
